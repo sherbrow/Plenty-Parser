@@ -51,9 +51,9 @@ class Plenty_parser_smarty extends CI_Driver {
     public function assign_var($name, $val)
     {
         // If an empty variable name or value supplied
-        if (empty($name) OR empty($val))
+        if (empty($name))
         {
-            show_error('Smarty assign var function expects a name and value for assigning variables');
+            show_error('Smarty assign var function expects a name for assigning variables');
         }
         
         // Call Smarty assign function
