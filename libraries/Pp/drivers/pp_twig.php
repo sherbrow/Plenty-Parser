@@ -10,9 +10,11 @@
 * @version 1.0
 */
 
-class Plenty_parser_twig extends CI_Driver {
+class Pp_twig extends CI_Driver {
     
     protected $ci;
+
+    protected $_twig;
     
     protected $_template;
     
@@ -28,12 +30,15 @@ class Plenty_parser_twig extends CI_Driver {
         ini_get('include_path') . PATH_SEPARATOR . APPPATH . 'third_party/Twig');
 
         require_once (string) "Autoloader" . EXT;
-        
+
         Twig_Autoloader::register();
-        
-        $this->_template_dir = config_item('parser.twig.location');
-        $this->_cache_dir    = config_item('parser.twig.cache_location');
-        $this->_debug        = config_item('parser.twig.debug');
+
+        $loader = new Twig_Loader_Filesystem($this->_template_dir);
+
+        $this->_twig = new Twig_Environment($loader, array(
+            'cache' => $this->_cache_dir,
+            'debug' => $this->_debug,
+        ));
         
         // Check if a theme has been set and if there is, check it exists and add it to the path
              
@@ -49,6 +54,26 @@ class Plenty_parser_twig extends CI_Driver {
     {
         $this->_template_dir = $location;
     }
+
+    /**
+     * Assign Var
+     * Assign a variable for template view use
+     *
+     * @param mixed $name
+     * @param mixed $val
+     * @returns void
+     */
+    public function assign_var($name, $val)
+    {
+        // If an empty variable name
+        if (empty($name))
+        {
+            show_error('Smarty assign var function expects a name and value for assigning variables');
+        }
+
+        // Call Smarty assign function
+        $this->_smarty->assign($name, $val);
+    }
 	
     /**
     * Load the template and return the data
@@ -59,17 +84,22 @@ class Plenty_parser_twig extends CI_Driver {
     */
 	public function parse($template, $data = array(), $return = false)
     {
-        $loader = new Twig_Loader_Filesystem($this->_template_dir);
-        $twig   = new Twig_Environment($loader, array('cache' => $this->_cache_dir,'debug' => $this->_debug));
-         
-        $template = $twig->loadTemplate($template);
-        
-        if (is_array($data))
+        // If we do not have a template extension, use the default
+        if (stripos($template, '.') === false)
         {
-            $data = array_merge($data, $this->ci->load->_ci_cached_vars);
+            $template . config_item('parser.twig.extension');
+        }
+
+        // Load the template
+        $template = $this->_twig->loadTemplate($template);
+
+        // If data supplied is an array
+        if ( is_array($data) )
+        {
+            $data = array_merge($data, $this->ci->load->get_vars());
         }
         
-        if ($return === true)
+        if ( $return === true )
         {
             return $template->render($data);   
         }
@@ -90,29 +120,32 @@ class Plenty_parser_twig extends CI_Driver {
     */
     public function parse_string($string, $data = array(), $return = false)
     {
-        $loader = new Twig_Loader_String($this->_template_dir);
-
-        $twig = new Twig_Environment($loader, array(
-            'cache' => $this->_cache_dir,
-            'debug' => $this->_debug,
-        ));
+        $string = $this->_twig->loadTemplate($string);
         
-        $string = $twig->loadTemplate($string);
-        
-        if (is_array($data))
+        if ( is_array($data) )
         {
-            $data = array_merge($data, $this->ci->load->_ci_cached_vars);
+            $data = array_merge($data, $this->ci->load->get_vars());
         }
         
         if ($return === true)
         {
-            return $template->render($data);
+            return $string->render($data);
         }
         else
         {
-            return $template->display($data);
+            return $string->display($data);
         }
         
+    }
+
+    /**
+     * Register Plugin
+     * Registers a plugin for use in a Twig template.
+     * @param $name
+     */
+    public function register_plugin($name)
+    {
+        $this->_twig->addFunction($name, new Twig_Function_Function($name));
     }
 
 }

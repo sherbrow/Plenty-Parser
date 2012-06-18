@@ -18,7 +18,7 @@ $config['parser.theme.enabled'] = false;
 // Where are themes located?
 $config['parser.theme.locations'] = array(
     APPPATH . "themes",
-    "../themes"
+    FCPATH . "themes"
 );
 
 // Default theme to use
@@ -30,10 +30,10 @@ $config['parser.theme.default'] = "";
 $config['parser.twig.extension'] = ".twig";
 
 // Default template location
-$config['parser.twig.location'] = APPPATH . "views";
+$config['parser.twig.location'] = APPPATH . "views/";
 
 // Twig template caching location
-$config['parser.twig.cache_location'] = APPPATH . "cache/twig";
+$config['parser.twig.cache_location'] = APPPATH . "cache/twig/";
 
 // Debug mode turned on or off for Twig?
 $config['parser.twig.debug'] = false;
@@ -43,8 +43,14 @@ $config['parser.twig.debug'] = false;
 // Smarty template extension (default)
 $config['parser.smarty.extension'] = ".php";
 
+// Left delimiter
+$config['parser.smarty.left.delim'] = "{";
+
+// Right delimiter
+$config['parser.smarty.right.delim'] = "}";
+
 // Default location for finding Smarty templates
-$config['parser.smarty.location'] = APPPATH . "views";
+$config['parser.smarty.location'] = APPPATH . "views/";
 
 // Where compiled Smarty templates will reside
 $config['parser.smarty.compile_dir'] = APPPATH . "cache/smarty/compiled/";
