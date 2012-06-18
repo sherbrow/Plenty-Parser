@@ -181,6 +181,7 @@ class Pp extends CI_Driver_Library {
     * @param mixed $value
     * @returns void
     */
+	public function assign($name, $value) { return $this->assign_var($name, $value); }
     public function assign_var($name, $value)
     {
         return $this->{$this->_current_driver}->assign_var($name, $value);
