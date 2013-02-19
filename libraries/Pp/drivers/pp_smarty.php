@@ -112,10 +112,12 @@ class Pp_smarty extends CI_Driver {
     * 
     * @param mixed $string
     * @param mixed $data
+    * @param mixed $return
     */
-    public function parse_string($string, $data = array())
+    public function parse_string($string, $data = array(), $return = true)
     {
-        return $this->_smarty->fetch('string:'.$string, $data);
+    	$template = 'string:'.$string;
+        return $this->parse($template, $data, $return);
     }
     
     
